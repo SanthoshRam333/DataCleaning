@@ -171,18 +171,32 @@ library(Hmisc) ; library(plyr)
 restaurantData2 = mutate(restaurantData, zipGroups = cut2(zipcode, g = 4))
 table(restaurantData2$zipGroups)
 
+#reshaping
+
+head(mtcars)
+
+mtcars$carname <- rownames(mtcars)
+carMelt <- melt(mtcars, id = c("carname", "gear", "cyl"), measure.vars = c("mpg", "hp"))
+head(carMelt, n = 3)
+tail(carMelt, n = 3)
+
+cyData <- dcast(carMelt, cyl ~ variable)
+cyData
+
+cyData <- dcast(carMelt, cyl ~ variable, mean)
+cyData
 
 
+#averaging values
 
+head(InsectSprays)
+tapply(InsectSprays$count, InsectSprays$spray, sum)
 
+spIns = split(InsectSprays$count, InsectSprays$spray)
+spIns
 
-
-
-
-
-
-
-
+sprCount = lapply(spIns, sum)
+sprCount
 
 
 
