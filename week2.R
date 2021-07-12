@@ -1,9 +1,11 @@
 
+
 #connecting and listing databases
 
 ucscDB <- dbConnect(MySQL(), user = "genome", host = "genome-mysql.cse.ucsc.edu")
 
 result <- dbGetQuery(ucscDB, "show databases;"); dbDisconnect(ucscDB);
+
 
 #connecting to hg19 and listing tables
 
@@ -93,20 +95,45 @@ htmlCode = readLines(con)
 close(con)
 htmlCode
 
-#
+
+#GET from the httr package
+
+url <- "https://www.theatlantic.com/technology/archive/2014/01/how-netflix-reverse-engineered-hollywood/282679/"
+
+library(httr) ; html2 = GET(url)
+content2 = content(html2, as = "text")
+parsedHtml = htmlParse(content2, asText = TRUE)
+xpathSApply(parsedHtml, "//title", xmlValue)
 
 
+#accessing websites with passwords
+
+pg1 <- GET("https://httpbin.org/basic-auth/user/passwd")
+pg1
+
+pg2 <- GET("https://httpbin.org/basic-auth/user/passwd", authenticate("user", "passwd"))
+pg2
+
+names(pg2)
 
 
+#using handles
+
+google = handle("http://google.com")
+pg1 = GET(handle = google, path = "/")
+pg1 = GET(handle = google, path = "search")
 
 
+#accessing twitter from R
+
+myapp = oauth_app("twiiter", key = "yourConsumerKey", secret = "yourConsumerSecret")
+sig = sign_oauth1.0(myapp, token = "yourToken", token_secret = "yourTokenSecret")
+homeTL = GET("https://api.twitter.com/1.1/statuses/home_timeline.json", sig)
 
 
+#converting the json object
 
-
-
-
-
-
-
+json1 = content(homeTL)
+json2 = jsonlite::fromJSON(toJSON(json1))
+json2[1, 1:4]
 
