@@ -198,6 +198,96 @@ spIns
 sprCount = lapply(spIns, sum)
 sprCount
 
+unlist(sprCount)
+
+sapply(spIns, sum)
+
+ddply(InsectSprays, .(spray), summarise, sum = sum(count))
+
+spraySums <- ddply(InsectSprays, .(spray), summarise, sum = ave(count, FUN = sum))
+dim(spraySums)
+
+head(spraySums)
 
 
+#dplyr package
 
+chicago <- readRDS("chicago.rds")
+
+head(select(chicago, city:dptp))
+
+head(select(chicago, -(city:dptp)))
+
+head(select(chicago, date:o3tmean2))
+
+chic.f <- filter(chicago, pm25tmean2 > 30)
+head(chic.f, 10)
+
+chicago <- arrange(chicago, date)
+head(chicago)
+tail(chicago)
+
+chicago <- arrange(chicago, desc(date))
+
+chicago <- rename(chicago, pm25 = pm25tmean2, dewpoint = dptp)
+names(chicago)
+
+chicago <- mutate(chicago, pm25detrend = pm25 - mean(pm25, na.rm = T))
+head(chicago)
+
+chicago <- mutate(chicago, tempcat = factor(1 * (tmpd > 80), labels = c("cold", "hot")))
+hotcold <- group_by(chicago, tempcat)
+hotcold
+
+summarise(hotcold, pm25 = mean(pm25), o3 = max(o3tmean2), no2 = median(no2tmean2))
+
+summarise(hotcold, pm25 = mean(pm25, na.rm = T), o3 = max(o3tmean2), no2 = median(no2tmean2))
+
+chicago <- mutate(chicago, year = as.POSIXlt(date)$year + 1900)
+years <- group_by(chicago, year)
+
+summarise(years, pm25 = mean(pm25, na.rm = T), o3 = max(o3tmean2), no2 = median(no2tmean2))
+
+#pipeline operator (%>%)
+
+chicago %>% mutate(month = as.POSIXlt(date)$mon + 1) %>% group_by(month) %>% summarise(pm25 = mean(pm25, na.rm = T), o3 = max(o3tmean2), no2 = median(no2tmean2))
+
+
+#merging data
+
+fileUrl1 = "https://raw.githubusercontent.com/DataScienceSpecialization/courses/master/03_GettingData/04_01_editingTextVariables/data/reviews.csv"
+fileUrl2 = "https://raw.githubusercontent.com/DataScienceSpecialization/courses/master/03_GettingData/04_01_editingTextVariables/data/solutions.csv"
+download.file(fileUrl1,destfile="./data/reviews.csv")
+download.file(fileUrl2,destfile="./data/solutions.csv")
+
+reviews = read.csv("./data/reviews.csv")
+solutions = read.csv("./data/solutions.csv")
+
+head(reviews)
+head(solutions)
+
+names(reviews)
+names(solutions)
+
+mergeData = merge(reviews, solutions, by.x = "solution_id", by.y = "id", all = T)
+head(mergeData)
+
+intersect(names(solutions), names(reviews))
+
+mergeData2 = merge(reviews, solutions, all = T)
+head(mergeData2)
+
+
+#using join in the plyr package
+
+df1 = data.frame(id = sample(1:10), x = rnorm(10))
+df2 = data.frame(id = sample(1:10), y = rnorm(10))
+
+arrange(join(df1, df2), id)
+
+df1 = data.frame(id = sample(1:10), x = rnorm(10))
+df2 = data.frame(id = sample(1:10), y = rnorm(10))
+df3 = data.frame(id = sample(1:10), z = rnorm(10))
+
+dfList = list(df1, df2, df3)
+join_all(dfList)
